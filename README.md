@@ -4,13 +4,13 @@ _El siguiente proyecto es una prueba técnica solicitada por la empresa SODIMAC 
 
 ### 1.	Definición de Módulos
 
-https://github.com/Malpor23/car-center/blob/main/img/1.png
+![Image text](https://github.com/Malpor23/car-center/blob/main/img/1.png)
 
 ### 2.	Tablas a crear con columnas y tipos
 ### 3.	Definición de llaves Primarias y Foráneas
 ### 4.	Modelo E/R
 
-https://github.com/Malpor23/car-center/blob/main/img/2.png
+![Image text](https://github.com/Malpor23/car-center/blob/main/img/2.png)
 
 ### 5.	Consulta de Clientes que han comprado un acumulado $100.000 en los últimos 60 días
 
