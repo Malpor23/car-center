@@ -1,4 +1,4 @@
-# Car Center "Prueba técnica ara Sodimac"
+# Car Center "Prueba técnica para Sodimac"
 
 _El siguiente proyecto es una prueba técnica solicitada por la empresa SODIMAC para el servicio de mantenimiento de vehículos_
 
