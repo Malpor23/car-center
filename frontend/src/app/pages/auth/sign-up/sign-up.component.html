@@ -1,0 +1,191 @@
+<div class="container-fluid p-0 h-100">
+  <div class="row no-gutters h-100">
+    <div class="col-lg-4 d-none d-lg-flex"
+      style="background-image: url('assets/images/others/sign-up-1.jpg')">
+      <div class="d-flex h-100 p-h-40 p-v-15 flex-column justify-content-between">
+        <div>
+          <h1 class="text-white m-b-20 font-weight-normal">Registro</h1>
+          <p class="text-white font-size-16 lh-2 w-80 opacity-08">
+            Regístrese para inscribir sus vehículos y solicitar los manteniemtos
+          </p>
+        </div>
+        <div class="d-flex justify-content-between"></div>
+      </div>
+    </div>
+    <div class="col-lg-8 bg-white">
+      <div class="container h-100">
+        <div class="row no-gutters h-100 align-items-center">
+          <div class="col-12">
+            <h2>Registro</h2>
+            <form nz-form
+              [formGroup]="newForm" novalidate
+              class="login-form"
+              [nzLayout]="'vertical'"
+            >
+              <div nz-row [nzGutter]="16">
+                <div nz-col nzXs="24" nzSm="24" nzMd="12">
+                  <nz-form-item>
+                    <nz-form-label nzRequired>Primer Nombre</nz-form-label>
+                    <nz-form-control>
+                      <input type="text" nz-input formControlName="primerNombre"/>
+                      <div *ngIf="newForm.controls.primerNombre.touched && newForm.controls.primerNombre.errors?.required"
+                        class="text text-danger mt-1">
+                          El primer nombre es obligatorio
+                      </div>
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+
+                <div nz-col nzXs="24" nzSm="24" nzMd="12">
+                  <nz-form-item>
+                    <nz-form-label>Segundo Nombre</nz-form-label>
+                    <nz-form-control>
+                      <input type="text" nz-input formControlName="segundoNombre"/>
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+
+                <div nz-col nzXs="24" nzSm="24" nzMd="12">
+                  <nz-form-item>
+                    <nz-form-label nzRequired>Primer Apellido</nz-form-label>
+                    <nz-form-control>
+                      <input type="text" nz-input formControlName="primerApellido"/>
+                      <div *ngIf="newForm.controls.primerApellido.touched && newForm.controls.primerApellido.errors?.required"
+                        class="text text-danger mt-1">
+                          El primer apellido es obligatorio
+                      </div>
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+
+                <div nz-col nzXs="24" nzSm="24" nzMd="12">
+                  <nz-form-item>
+                    <nz-form-label nzRequired>Segundo Apellido</nz-form-label>
+                    <nz-form-control>
+                      <input type="text" nz-input formControlName="segundoApellido"/>
+                      <div *ngIf="newForm.controls.segundoApellido.touched && newForm.controls.segundoApellido.errors?.required"
+                        class="text text-danger mt-1">
+                          El segundo apellido es obligatorio
+                      </div>
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+
+                <div nz-col nzXs="24" nzSm="24" nzMd="12">
+                  <nz-form-item>
+                    <nz-form-label nzRequired>Tipo Documento</nz-form-label>
+                    <nz-form-control>
+                      <nz-select formControlName="tipoDocumento" nzShowSearch>
+                        <nz-option *ngFor="let item of tipoDoc" [nzLabel]="item.descripcion" [nzValue]="item.id"></nz-option>
+                      </nz-select>
+                      <div *ngIf="newForm.controls.tipoDocumento.touched && newForm.controls.tipoDocumento.errors?.required" class="text text-danger mt-1">
+                        Debe seleccionar un tipo de documento
+                      </div>
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+
+                <div nz-col nzXs="24" nzSm="24" nzMd="12">
+                  <nz-form-item>
+                    <nz-form-label nzRequired>N° Documento</nz-form-label>
+                    <div *ngIf="newForm.controls.n_documento.touched && newForm.controls.n_documento.errors?.required"
+                      class="text text-danger mt-1">
+                        El número de documento es obligatorio
+                    </div>
+                    <nz-form-control>
+                      <input type="text" nz-input formControlName="n_documento"/>
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+
+                <div nz-col nzXs="24" nzSm="24" nzMd="12">
+                  <nz-form-item>
+                    <nz-form-label nzRequired>Celular</nz-form-label>
+                    <nz-form-control>
+                      <input type="text" nz-input formControlName="celular" onlyNumbers/>
+                      <div *ngIf="newForm.controls.celular.touched && newForm.controls.celular.errors?.required"
+                        class="text text-danger mt-1">
+                          El número de celular es obligatorio
+                      </div>
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+
+                <div nz-col nzXs="24" nzSm="24" nzMd="12">
+                  <nz-form-item>
+                    <nz-form-label nzRequired>Dirección</nz-form-label>
+                    <nz-form-control>
+                      <input type="text" nz-input formControlName="direccion"/>
+                      <div *ngIf="newForm.controls.direccion.touched && newForm.controls.direccion.errors?.required"
+                        class="text text-danger mt-1">
+                          La dirección es obligatoria
+                      </div>
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+
+                <div nz-col nzXs="24" nzSm="24" nzMd="24">
+                  <nz-form-item>
+                    <nz-form-label nzRequired>Correo</nz-form-label>
+                    <nz-form-control>
+                      <input type="email" nz-input formControlName="email" id="email"/>
+                      <div *ngIf="newForm.controls.email.touched && newForm.controls.email.errors?.required"
+                        class="text text-danger mt-1">
+                          El correo es requerido
+                      </div>
+                      <div *ngIf="newForm.controls.email.touched && newForm.controls.email.errors?.email"
+                        class="text text-danger mt-1">
+                          El correo es invalido
+                      </div>
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+
+                <div nz-col nzXs="24" nzSm="24" nzMd="12">
+                  <nz-form-item>
+                    <nz-form-label nzRequired>Usuario</nz-form-label>
+                    <nz-form-control>
+                      <input type="text" nz-input formControlName="username"/>
+                      <div *ngIf="newForm.controls.username.touched && newForm.controls.username.errors?.required"
+                        class="text text-danger mt-1">
+                          El usuario es requerido
+                      </div>
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+
+                <div nz-col nzXs="24" nzSm="24" nzMd="12">
+                  <nz-form-item>
+                    <nz-form-label nzRequired>Password</nz-form-label>
+                    <nz-form-control>
+                      <input type="password" nz-input formControlName="password" id="password"/>
+                      <div *ngIf="newForm.controls.password.touched && newForm.controls.password.errors?.required" class="text text-danger mt-1">
+                        La contraseña es requerida
+                      </div>
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-center justify-content-between">
+                <nz-form-item>
+                  <nz-form-control>
+                    <button
+                      nz-button
+                      class="login-form-button"
+                      [nzType]="'primary'"
+                      (click)="save(newForm)" 
+                      [disabled]="newForm.invalid"
+                    >
+                      Registrar
+                    </button>
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

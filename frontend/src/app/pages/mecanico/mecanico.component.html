@@ -1,0 +1,231 @@
+<nz-card *ngIf="principal">
+  <section class="markdown">
+    <h1>Macánicos<span class="subtitle"></span><span class="widget"></span></h1>
+  </section>
+  <div class="row m-b-30">
+    <div class="col-lg-8">
+      <div class="d-md-flex">
+        <div class="m-b-10 m-r-20"></div>
+      </div>
+    </div>
+    <div class="col-lg-4 text-right">
+      <a nz-button nzType="primary" (click)="enableNuevo()">
+        <i nz-icon nzType="plus-circle" theme="outline"></i>
+        <span>Nuevo</span>
+      </a>
+    </div>
+  </div>
+
+  <nz-table [nzData]="['']" [nzFrontPagination]="false">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Nombre</th>
+        <th>Apellidos</th>
+        <th>N° Documento</th>
+        <th>Tipo Documento</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of listMecanicos;  let i=index">
+        <td>{{ i+1 }}</td>
+        <td>{{ row.primerNombre }} {{ segundoNombre }}</td>
+        <td>{{ row.primerApellido }} {{ segundoApellido }}</td>
+        <td>{{ row.n_documento }}</td>
+        <td>{{ row.tipoDocumento.descripcion }}</td>
+        <td>
+          <nz-badge nzStatus="{{ row.estado === true ? 'success' : 'error'}}"></nz-badge>
+          <span class="text-capitalize">{{ row.estado === true ? 'Activo' : 'Inactivo' }}</span>
+        </td>
+        <td class="text-md-right">
+          <a class="m-r-5" (click)='enableEditar(row)' nz-button nzType="default" nzShape="circle" nz-tooltip nzTooltipTitle="Editar" >
+            <i nz-icon nzType="edit" theme="outline"></i>
+          </a>
+          <button nz-button (click)='delete(row)' nzType="default" nzShape="circle" nz-tooltip nzTooltipTitle="Eliminar">
+            <i nz-icon nzType="delete" theme="outline"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+  <nz-pagination 
+    [nzPageIndex]="1" 
+    [nzTotal]="total" 
+    (nzPageIndexChange)="getPage($event)"
+    [nzPageSize]="size"
+  ></nz-pagination>
+</nz-card>
+
+<!-- FORM -->
+<nz-card *ngIf="crud">
+  <section class="markdown">
+    <h1>{{ title }}<span class="subtitle"></span><span class="widget"></span></h1>
+  </section>
+
+  <form nz-form [formGroup]="newForm" novalidate class="login-form" [nzLayout]="'vertical'">
+    <div nz-row [nzGutter]="16">
+      <div nz-col nzXs="24" nzSm="24" nzMd="8" nzLg="8">
+        <nz-form-item>
+          <nz-form-label nzRequired>Primer Nombre</nz-form-label>
+          <nz-form-control>
+            <input type="text" nz-input formControlName="primerNombre"/>
+            <div *ngIf="newForm.controls.primerNombre.touched && newForm.controls.primerNombre.errors?.required"
+              class="text text-danger mt-1">
+                El primer nombre es obligatorio
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="8" nzLg="8">
+        <nz-form-item>
+          <nz-form-label>Segundo Nombre</nz-form-label>
+          <nz-form-control>
+            <input type="text" nz-input formControlName="segundoNombre"/>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="8" nzLg="8">
+        <nz-form-item>
+          <nz-form-label nzRequired>Primer Apellido</nz-form-label>
+          <nz-form-control>
+            <input type="text" nz-input formControlName="primerApellido"/>
+            <div *ngIf="newForm.controls.primerApellido.touched && newForm.controls.primerApellido.errors?.required"
+              class="text text-danger mt-1">
+                El primer apellido es obligatorio
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="8" nzLg="8">
+        <nz-form-item>
+          <nz-form-label nzRequired>Segundo Apellido</nz-form-label>
+          <nz-form-control>
+            <input type="text" nz-input formControlName="segundoApellido"/>
+            <div *ngIf="newForm.controls.segundoApellido.touched && newForm.controls.segundoApellido.errors?.required"
+              class="text text-danger mt-1">
+                El segundo apellido es obligatorio
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="8" nzLg="8">
+        <nz-form-item>
+          <nz-form-label nzRequired>Tipo documento</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="tipoDocumento" nzShowSearch>
+              <nz-option *ngFor="let item of tipoDocumento" [nzLabel]="item.descripcion" [nzValue]="item.id"></nz-option>
+            </nz-select>
+            <div *ngIf="newForm.controls.tipoDocumento.touched && newForm.controls.tipoDocumento.errors?.required" class="text text-danger mt-1">
+              Debe seleccionar un tipo de documento
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="8" nzLg="8">
+        <nz-form-item>
+          <nz-form-label nzRequired>N° Documento</nz-form-label>
+          <nz-form-control>
+            <input type="text" nz-input formControlName="n_documento"/>
+            <div *ngIf="newForm.controls.n_documento.touched && newForm.controls.n_documento.errors?.required"
+              class="text text-danger mt-1">
+                El número de documento es obligatorio
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="8" nzLg="8">
+        <nz-form-item>
+          <nz-form-label nzRequired>Celular</nz-form-label>
+          <div *ngIf="newForm.controls.celular.touched && newForm.controls.celular.errors?.required"
+            class="text text-danger mt-1">
+              El celular es obligatorio
+          </div>
+          <nz-form-control>
+            <input type="number" nz-input formControlName="celular" onlyNumbers/>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="8" nzLg="8">
+        <nz-form-item>
+          <nz-form-label nzRequired>Dirección</nz-form-label>
+          <nz-form-control>
+            <input type="text" nz-input formControlName="direccion"/>
+            <div *ngIf="newForm.controls.direccion.touched && newForm.controls.direccion.errors?.required"
+              class="text text-danger mt-1">
+                La dirección es obligatoria
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="8" nzLg="8">
+        <nz-form-item>
+          <nz-form-label nzRequired>Correo</nz-form-label>
+          <nz-form-control>
+            <input type="email" nz-input formControlName="email" id="email"/>
+            <div *ngIf="newForm.controls.email.touched && newForm.controls.email.errors?.required"
+              class="text text-danger mt-1">
+                El correo es requerido
+            </div>
+            <div *ngIf="newForm.controls.email.touched && newForm.controls.email.errors?.email"
+              class="text text-danger mt-1">
+                El correo es invalido
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="8" nzLg="8">
+        <nz-form-item>
+          <nz-form-label>Estado</nz-form-label>
+          <nz-form-control>
+            <nz-switch formControlName="estado" [nzCheckedChildren]="checkedTemplate" [nzUnCheckedChildren]="unCheckedTemplate"></nz-switch>
+            <ng-template #checkedTemplate><i nz-icon nzType="check"></i></ng-template>
+            <ng-template #unCheckedTemplate><i nz-icon nzType="close"></i></ng-template>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between">
+      <nz-form-item>
+        <nz-form-control>
+          <button
+            nz-button
+            class="login-form-button"
+            [nzType]="'primary'"
+            [disabled]="newForm.invalid"
+            (click)="save(newForm)"
+          >
+            <i nz-icon nzType="plus-circle" theme="outline"></i>
+            <span>{{ action }}</span> 
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+      
+      <nz-form-item>
+        <nz-form-control>
+          <button
+            nz-button
+            class="login-form-button"
+            [nzType]="'primary'"
+            nzDanger
+            (click)="enableCerrar()"
+          >
+            <i nz-icon nzType="close-circle" theme="outline"></i>
+            <span>Cancelar</span> 
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </form>
+</nz-card>

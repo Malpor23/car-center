@@ -1,0 +1,174 @@
+<nz-card *ngIf="principal">
+  <section class="markdown">
+    <h1>Mantenimientos<span class="subtitle"></span><span class="widget"></span></h1>
+  </section>
+  <div class="row m-b-30">
+    <div class="col-lg-8">
+      <div class="d-md-flex">
+        <div class="m-b-10 m-r-20"></div>
+      </div>
+    </div>
+    <div class="col-lg-4 text-right">
+      <a nz-button nzType="primary" (click)="enableNuevo()">
+        <i nz-icon nzType="plus-circle" theme="outline"></i>
+        <span>Nuevo</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="row m-b-30">
+    
+  </div>
+
+  <nz-table [nzData]="['']" [nzFrontPagination]="false">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Descripción</th>
+        <th>Cliente</th>
+        <th>Servicio</th>
+        <th>Presupuesto</th>
+        <th>Fecha Solicitud</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of listMantenimientos;  let i=index">
+        <td>{{ i+1 }}</td>
+        <td>{{ row.descripcion }}</td>
+        <td>
+          {{ row.solicitud.clienteVehiculo.cliente.primerNombre }} {{ row.solicitud.clienteVehiculo.cliente.primerApellido }} {{ row.solicitud.clienteVehiculo.cliente.segundoApellido }}
+        </td>
+        <td>{{ row.solicitud.servicio.nombre }}</td>
+        <td>${{ row.solicitud.presupuesto  | number:'3.2-5' }}</td>
+        <td>{{ row.solicitud.fechaServicio | date:'longDate' }}</td>
+        <td>
+          <nz-badge *ngIf="row.estado == 'En proceso'" nzStatus="processing"></nz-badge>
+          <nz-badge *ngIf="row.estado == 'Terminado'" nzStatus="success"></nz-badge>
+          <span class="text-capitalize">{{ row.estado }}</span>
+        </td>
+        <td class="text-md-right">
+          <a *ngIf="row.estado == 'En proceso'"
+            class="m-r-5" 
+            (click)='enableEditar(row)' 
+            nz-button nzType="default" 
+            nzShape="circle" nz-tooltip nzTooltipTitle="Editar"
+          >
+            <i nz-icon nzType="edit" theme="outline"></i>
+          </a>
+          <button 
+            *ngIf="row.estado == 'En proceso'"
+            nz-button 
+            (click)='delete(row)' 
+            nzType="default" 
+            nzShape="circle" nz-tooltip nzTooltipTitle="Eliminar"
+          >
+            <i nz-icon nzType="delete" theme="outline"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+  <nz-pagination 
+    [nzPageIndex]="1" 
+    [nzTotal]="total" 
+    (nzPageIndexChange)="getPage($event)"
+    [nzPageSize]="size"
+  ></nz-pagination>
+</nz-card>
+
+<!-- FORM -->
+<nz-card *ngIf="crud">
+  <section class="markdown">
+    <h1>{{ title }}<span class="subtitle"></span><span class="widget"></span></h1>
+  </section>
+
+  <form nz-form [formGroup]="newForm" novalidate class="login-form" [nzLayout]="'vertical'">
+    <div nz-row [nzGutter]="16">
+      <div nz-col nzXs="24" nzSm="24" nzMd="18" nzLg="18">
+        <nz-form-item>
+          <nz-form-label nzRequired>Solicitud</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="solicitud" nzShowSearch>
+              <nz-option 
+                *ngFor="let item of listSolicitudes" 
+                [nzLabel]="item.label" 
+                [nzValue]="item.value">
+              </nz-option>
+            </nz-select>
+            <div *ngIf="newForm.controls.solicitud.touched && newForm.controls.solicitud.errors?.required" class="text text-danger mt-1">
+              Debe seleccionar una solicitud
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="6" nzLg="6">
+        <nz-form-item>
+          <nz-form-label nzRequired>Estado</nz-form-label>
+          <nz-select formControlName="estado" nzShowSearch>
+            <nz-option nzValue="En proceso" nzLabel="En proceso"></nz-option>
+            <nz-option nzValue="Terminado" nzLabel="Terminado"></nz-option>
+          </nz-select>
+          <div *ngIf="newForm.controls.estado.touched && newForm.controls.estado.errors?.required" class="text text-danger mt-1">
+            Debe seleccionar un estado
+          </div>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
+        <nz-form-item>
+          <nz-form-label nzRequired>Descripción</nz-form-label>
+          <nz-form-control>
+            <textarea rows="2" nz-input formControlName="descripcion"></textarea>
+            <div *ngIf="newForm.controls.descripcion.touched && newForm.controls.descripcion.errors?.required" class="text text-danger mt-1">
+              La descripción es obligatoria
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
+        <nz-form-item>
+          <nz-form-label>Observación</nz-form-label>
+          <nz-form-control>
+            <textarea rows="2" nz-input formControlName="observacion"></textarea>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between">
+      <nz-form-item>
+        <nz-form-control>
+          <button
+            nz-button
+            class="login-form-button"
+            [nzType]="'primary'"
+            [disabled]="newForm.invalid"
+            (click)="save(newForm)"
+          >
+            <i nz-icon nzType="plus-circle" theme="outline"></i>
+            <span>{{ action }}</span> 
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+      
+      <nz-form-item>
+        <nz-form-control>
+          <button
+            nz-button
+            class="login-form-button"
+            [nzType]="'primary'"
+            nzDanger
+            (click)="enableCerrar()"
+          >
+            <i nz-icon nzType="close-circle" theme="outline"></i>
+            <span>Cancelar</span> 
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </form>
+</nz-card>

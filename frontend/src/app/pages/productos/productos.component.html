@@ -1,0 +1,169 @@
+<nz-card *ngIf="principal">
+  <section class="markdown">
+    <h1>Productos / Servicios<span class="subtitle"></span><span class="widget"></span></h1>
+  </section>
+  <div class="row m-b-30">
+    <div class="col-lg-8">
+      <div class="d-md-flex">
+        <div class="m-b-10 m-r-20"></div>
+      </div>
+    </div>
+    <div class="col-lg-4 text-right">
+      <a nz-button nzType="primary" (click)="enableNuevo()">
+        <i nz-icon nzType="plus-circle" theme="outline"></i>
+        <span>Nuevo</span>
+      </a>
+    </div>
+  </div>
+
+  <nz-table [nzData]="['']" [nzFrontPagination]="false">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Producto/Servicio</th>
+        <th>Tipo</th>
+        <th>Precio</th>
+        <th>Valor mínimo</th>
+        <th>Valor máximo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of listProductos;  let i=index">
+        <td>{{ i+1 }}</td>
+        <td>{{ row.nombre }}</td>
+        <td>
+          <nz-badge *ngIf="row.tipoProducto.descripcion == 'Producto'" nzStatus="success"></nz-badge>
+          <nz-badge *ngIf="row.tipoProducto.descripcion == 'Servicio'" nzStatus="error"></nz-badge>
+          <span class="text-capitalize">{{ row.tipoProducto.descripcion }}</span>
+        </td>
+        <td>${{ row.precio | number:'3.2-5' }}</td>
+        <td>${{ row.valorMinimo | number:'3.2-5' }}</td>
+        <td>${{ row.valorMaximo | number:'3.2-5' }}</td>
+        <td class="text-md-right">
+          <a class="m-r-5" (click)='enableEditar(row)' nz-button nzType="default" nzShape="circle" nz-tooltip nzTooltipTitle="Editar" >
+            <i nz-icon nzType="edit" theme="outline"></i>
+          </a>
+          <button nz-button (click)='delete(row)' nzType="default" nzShape="circle" nz-tooltip nzTooltipTitle="Eliminar">
+            <i nz-icon nzType="delete" theme="outline"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+  <nz-pagination 
+    [nzPageIndex]="1" 
+    [nzTotal]="total" 
+    (nzPageIndexChange)="getPage($event)"
+    [nzPageSize]="size"
+  ></nz-pagination>
+</nz-card>
+
+<!-- FORM -->
+<nz-card *ngIf="crud">
+  <section class="markdown">
+    <h1>{{ title }}<span class="subtitle"></span><span class="widget"></span></h1>
+  </section>
+
+  <form nz-form [formGroup]="newForm" novalidate class="login-form" [nzLayout]="'vertical'">
+    <div nz-row [nzGutter]="18">
+      <div nz-col nzXs="24" nzSm="24" nzMd="6" nzLg="6">
+        <nz-form-item>
+          <nz-form-label nzRequired>Tipo</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="tipoProducto" nzShowSearch>
+              <nz-option *ngFor="let item of tipoProd" [nzLabel]="item.descripcion" [nzValue]="item.id"></nz-option>
+            </nz-select>
+            <div *ngIf="newForm.controls.tipoProducto.touched && newForm.controls.tipoProducto.errors?.required" class="text text-danger mt-1">
+              Debe seleccionar un tipo de producto
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="18" nzLg="18">
+        <nz-form-item>
+          <nz-form-label nzRequired>Nombre</nz-form-label>
+          <nz-form-control>
+            <input type="text" nz-input formControlName="nombre"/>
+            <div *ngIf="newForm.controls.nombre.touched && newForm.controls.nombre.errors?.required"
+              class="text text-danger mt-1">
+                El nombre es obligatorio
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="8" nzLg="8">
+        <nz-form-item>
+          <nz-form-label nzRequired>Precio</nz-form-label>
+          <nz-form-control>
+            <input type="number" nz-input formControlName="precio" onlyNumbers/>
+            <div *ngIf="newForm.controls.precio.touched && newForm.controls.precio.errors?.required"
+              class="text text-danger mt-1">
+                El precio es obligatorio
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="8" nzLg="8" *ngIf="servicio">
+        <nz-form-item>
+          <nz-form-label nzRequired>Valor mínimo</nz-form-label>
+          <nz-form-control>
+            <input type="number" nz-input formControlName="valorMinimo" onlyNumbers/>
+            <div *ngIf="newForm.controls.valorMinimo.touched && newForm.controls.valorMinimo.errors?.required"
+              class="text text-danger mt-1">
+                El valor mínimo es obligatorio
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="8" nzLg="8" *ngIf="servicio">
+        <nz-form-item>
+          <nz-form-label nzRequired>Valor máximo</nz-form-label>
+          <nz-form-control>
+            <input type="number" nz-input formControlName="valorMaximo" onlyNumbers/>
+            <div *ngIf="newForm.controls.valorMaximo.touched && newForm.controls.valorMaximo.errors?.required"
+              class="text text-danger mt-1">
+                El valor maximo es obligatorio
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between">
+      <nz-form-item>
+        <nz-form-control>
+          <button
+            nz-button
+            class="login-form-button"
+            [nzType]="'primary'"
+            [disabled]="newForm.invalid"
+            (click)="save(newForm)"
+          >
+            <i nz-icon nzType="plus-circle" theme="outline"></i>
+            <span>{{ action }}</span> 
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+      
+      <nz-form-item>
+        <nz-form-control>
+          <button
+            nz-button
+            class="login-form-button"
+            [nzType]="'primary'"
+            nzDanger
+            (click)="enableCerrar()"
+          >
+            <i nz-icon nzType="close-circle" theme="outline"></i>
+            <span>Cancelar</span> 
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </form>
+</nz-card>

@@ -1,0 +1,207 @@
+<nz-card *ngIf="principal">
+  <section class="markdown">
+    <h1>Solicitudes de Servicios<span class="subtitle"></span><span class="widget"></span></h1>
+  </section>
+  <div class="row m-b-30">
+    <div class="col-lg-8">
+      <div class="d-md-flex">
+        <div class="m-b-10 m-r-20"></div>
+      </div>
+    </div>
+    <div class="col-lg-4 text-right">
+      <a nz-button nzType="primary" (click)="enableNuevo()">
+        <i nz-icon nzType="plus-circle" theme="outline"></i>
+        <span>Nuevo</span>
+      </a>
+    </div>
+  </div>
+
+  <nz-table [nzData]="['']" [nzFrontPagination]="false">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Servicio</th>
+        <th>Vehículo</th>
+        <th>Presupuesto</th>
+        <th>Fecha</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of listSolicitudes;  let i=index">
+        <td>{{ i+1 }}</td>
+        <td>{{ row.servicio.nombre }}</td>
+        <td>{{ row.clienteVehiculo.vehiculo.marca }} {{ row.clienteVehiculo.vehiculo.modelo }}</td>
+        <td>${{ row.presupuesto  | number:'3.2-5' }}</td>
+        <td>{{ row.fechaServicio | date:'longDate' }}</td>
+        <td>
+          <nz-badge *ngIf="row.estado == 'En solicitud'" nzColor="#2db7f5"></nz-badge>
+          <nz-badge *ngIf="row.estado == 'En proceso'" nzStatus="processing"></nz-badge>
+          <nz-badge *ngIf="row.estado == 'Terminado'" nzStatus="success"></nz-badge>
+          <span class="text-capitalize">{{ row.estado }}</span>
+        </td>
+        <td class="text-md-right">
+          <a *ngIf="row.estado == 'En solicitud'"
+            class="m-r-5" 
+            (click)='enableEditar(row)' 
+            nz-button nzType="default" 
+            nzShape="circle" nz-tooltip nzTooltipTitle="Editar"
+          >
+            <i nz-icon nzType="edit" theme="outline"></i>
+          </a>
+          <button 
+            *ngIf="row.estado == 'En solicitud'"
+            nz-button 
+            (click)='delete(row)' 
+            nzType="default" 
+            nzShape="circle" nz-tooltip nzTooltipTitle="Eliminar"
+          >
+            <i nz-icon nzType="delete" theme="outline"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+  <nz-pagination 
+    [nzPageIndex]="1" 
+    [nzTotal]="total" 
+    (nzPageIndexChange)="getPage($event)"
+    [nzPageSize]="size"
+  ></nz-pagination>
+</nz-card>
+
+<!-- FORM -->
+<nz-card *ngIf="crud">
+  <section class="markdown">
+    <h1>{{ title }}<span class="subtitle"></span><span class="widget"></span></h1>
+  </section>
+
+  <form nz-form [formGroup]="newForm" novalidate class="login-form" [nzLayout]="'vertical'">
+    <div nz-row [nzGutter]="18">
+      <div nz-col nzXs="24" nzSm="12" nzMd="8" nzLg="8">
+        <nz-form-item>
+          <nz-form-label nzRequired>Vehículo</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="clienteVehiculo" nzShowSearch nzAllowClear>
+              <nz-option 
+                *ngFor="let item of listVehiculos" 
+                [nzLabel]="item.label" 
+                [nzValue]="item.value"
+                [nzNotFoundContent]="'No se encontraron registros!'"          
+                [nzCustomContent]="'false'"
+              ></nz-option>
+            </nz-select>
+            <div *ngIf="newForm.controls.clienteVehiculo.touched && newForm.controls.clienteVehiculo.errors?.required" class="text text-danger mt-1">
+              Debe seleccionar un vehículo
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="12" nzMd="8" nzLg="8">
+        <nz-form-item>
+          <nz-form-label nzRequired>Fecha</nz-form-label>
+          <nz-form-control>
+            <nz-date-picker 
+              [nzFormat]="yyyy-MM-dd" 
+              formControlName="fechaServicio" 
+              [nzStyle]="{'width': '100%'}" 
+              nzPlaceHolder="YYYY-MM-DD"
+            ></nz-date-picker>
+            <div *ngIf="newForm.controls.fechaServicio.touched && newForm.controls.fechaServicio.errors?.required"
+              class="text text-danger mt-1">
+                La fecha es obligatoria
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="8" nzLg="8">
+        <nz-form-item>
+          <nz-form-label>Presupuesto</nz-form-label>
+          <nz-form-control>
+            <input type="number" nz-input formControlName="presupuesto" onlyNumbers/>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="16" nzLg="16">
+        <nz-form-item>
+          <nz-form-label nzRequired>Servicio</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="servicio" nzShowSearch>
+              <nz-option 
+                *ngFor="let item of listServicios" 
+                [nzLabel]="item.nombre" 
+                [nzValue]="item.id"
+              ></nz-option>
+            </nz-select>
+            <div *ngIf="newForm.controls.servicio.touched && newForm.controls.servicio.errors?.required" class="text text-danger mt-1">
+              Debe seleccionar un servicio
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="8" nzLg="8">
+        <nz-form-item>
+          <nz-form-label nzRequired>Tienda</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="tienda" nzShowSearch>
+              <nz-option 
+                *ngFor="let item of listTienda" 
+                [nzLabel]="item.razon_social" 
+                [nzValue]="item.id"
+              ></nz-option>
+            </nz-select>
+            <div *ngIf="newForm.controls.tienda.touched && newForm.controls.tienda.errors?.required" class="text text-danger mt-1">
+              Debe seleccionar una tienda
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
+        <nz-form-item>
+          <nz-form-label>Observación</nz-form-label>
+          <nz-form-control>
+            <textarea rows="2" nz-input formControlName="observacion"></textarea>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between">
+      <nz-form-item>
+        <nz-form-control>
+          <button
+            nz-button
+            class="login-form-button"
+            [nzType]="'primary'"
+            [disabled]="newForm.invalid"
+            (click)="save(newForm)"
+          >
+            <i nz-icon nzType="plus-circle" theme="outline"></i>
+            <span>{{ action }}</span> 
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-control>
+          <button
+            nz-button
+            class="login-form-button"
+            [nzType]="'primary'"
+            nzDanger
+            (click)="enableCerrar()"
+          >
+            <i nz-icon nzType="close-circle" theme="outline"></i>
+            <span>Cancelar</span> 
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </form>
+</nz-card>

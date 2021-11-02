@@ -1,0 +1,106 @@
+<nz-card *ngIf="principal">
+  <section class="markdown">
+    <h1>Mis Vehículos<span class="subtitle"></span><span class="widget"></span></h1>
+  </section>
+  <div class="row m-b-30">
+    <div class="col-lg-8">
+      <div class="d-md-flex">
+        <div class="m-b-10 m-r-20"></div>
+      </div>
+    </div>
+    <div class="col-lg-4 text-right">
+      <a nz-button nzType="primary" (click)="enableNuevo()">
+        <i nz-icon nzType="plus-circle" theme="outline"></i>
+        <span>Nuevo</span>
+      </a>
+    </div>
+  </div>
+
+  <nz-table [nzData]="['']" [nzFrontPagination]="false">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Marca</th>
+        <th>Modelo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of listVehiculos;  let i=index">
+        <td>{{ i+1 }}</td>
+        <td>{{ row.vehiculo.marca }}</td>
+        <td>{{ row.vehiculo.modelo }}</td>
+        <td class="text-md-right">
+          <a class="m-r-5" (click)='enableEditar(row)' nz-button nzType="default" nzShape="circle" nz-tooltip nzTooltipTitle="Editar" >
+            <i nz-icon nzType="edit" theme="outline"></i>
+          </a>
+          <button nz-button (click)='delete(row)' nzType="default" nzShape="circle" nz-tooltip nzTooltipTitle="Eliminar">
+            <i nz-icon nzType="delete" theme="outline"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+</nz-card>
+
+<!-- FORM -->
+<nz-card *ngIf="crud">
+  <section class="markdown">
+    <h1>{{ title }}<span class="subtitle"></span><span class="widget"></span></h1>
+  </section>
+
+  <form nz-form [formGroup]="newForm" novalidate class="login-form" [nzLayout]="'vertical'">
+    <div nz-row [nzGutter]="16">
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
+        <nz-form-item>
+          <nz-form-label nzRequired>Vehículo</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="vehiculo_id" nzShowSearch>
+              <nz-option 
+                *ngFor="let item of vehi" 
+                [nzLabel]="item.label" 
+                [nzValue]="item.value">
+              </nz-option>
+            </nz-select>
+            <div *ngIf="newForm.controls.vehiculo_id.touched && newForm.controls.vehiculo_id.errors?.required" class="text text-danger mt-1">
+              Debe seleccionar un vehículo
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between">
+      <nz-form-item>
+        <nz-form-control>
+          <button
+            nz-button
+            class="login-form-button"
+            [nzType]="'primary'"
+            [disabled]="newForm.invalid"
+            (click)="save(newForm)"
+          >
+            <i nz-icon nzType="plus-circle" theme="outline"></i>
+            <span>{{ action }}</span> 
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+      
+      <nz-form-item>
+        <nz-form-control>
+          <button
+            nz-button
+            class="login-form-button"
+            [nzType]="'primary'"
+            nzDanger
+            (click)="enableCerrar()"
+          >
+            <i nz-icon nzType="close-circle" theme="outline"></i>
+            <span>Cancelar</span> 
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </form>
+</nz-card>

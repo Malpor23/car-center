@@ -1,0 +1,196 @@
+<nz-card *ngIf="principal">
+  <section class="markdown">
+    <h1>Facturas<span class="subtitle"></span><span class="widget"></span></h1>
+  </section>
+  <div class="row m-b-30">
+    <div class="col-lg-8">
+      <div class="d-md-flex">
+        <div class="m-b-10 m-r-20"></div>
+      </div>
+    </div>
+    <div class="col-lg-4 text-right">
+      <a nz-button nzType="primary" (click)="enableNuevo()">
+        <i nz-icon nzType="plus-circle" theme="outline"></i>
+        <span>Nuevo</span>
+      </a>
+    </div>
+  </div>
+
+  <nz-table [nzData]="['']" [nzFrontPagination]="false">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Cliente</th>
+        <th>Servicio</th>
+        <th>Total</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of listFacturas;  let i=index">
+        <td>{{ i+1 }}</td>
+        <td>{{ row.nombre }}</td>
+        <td>{{ row.servicio }}</td>
+        <td>${{ row.total | number:'3.2-5' }}</td>
+        <td>{{ row.created_at | date:'longDate' }}</td>
+      </tr>
+    </tbody>
+  </nz-table>
+  <nz-pagination 
+    [nzPageIndex]="1" 
+    [nzTotal]="total" 
+    (nzPageIndexChange)="getPage($event)"
+    [nzPageSize]="size"
+  ></nz-pagination>
+</nz-card>
+
+<!-- FORM -->
+<nz-card *ngIf="crud">
+  <section class="markdown">
+    <h1>{{ title }}<span class="subtitle"></span><span class="widget"></span></h1>
+  </section>
+
+  <form nz-form [formGroup]="newForm" novalidate [nzLayout]="'vertical'">
+    <div nz-row [nzGutter]="16">
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="12">
+        <nz-form-item>
+          <nz-form-label nzRequired>Cliente</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="cliente" nzShowSearch (ngModelChange)="onChange($event)">
+              <nz-option 
+                *ngFor="let item of listClientes" 
+                [nzLabel]="item.label" 
+                [nzValue]="item.value">
+              </nz-option>
+            </nz-select>
+            <div *ngIf="newForm.controls.cliente.touched && newForm.controls.cliente.errors?.required" class="text text-danger mt-1">
+              Debe seleccionar un cliente
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="12">
+        <nz-form-item>
+          <nz-form-label nzRequired>Mantenimiento</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="mantenimiento" nzShowSearch (ngModelChange)="onChangeMant($event)">
+              <nz-option 
+                *ngFor="let item of ListMantenimientos" 
+                [nzLabel]="item.label" 
+                [nzValue]="item.value"
+              >
+              </nz-option>
+            </nz-select>
+            <div *ngIf="newForm.controls.mantenimiento.touched && newForm.controls.mantenimiento.errors?.required" class="text text-danger mt-1">
+              Debe seleccionar un mantenimiento
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
+        <nz-form-item>
+          <nz-form-label>Mecanico</nz-form-label>
+          <nz-form-control>
+            <input type="text" nz-input formControlName="n_mecanico" readonly/>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
+        <nz-form-item>
+          <nz-form-label>Productos</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="product" nzShowSearch (ngModelChange)="addProduct($event)">
+              <nz-option 
+                *ngFor="let item of listProductos" 
+                [nzLabel]="item.label" 
+                [nzValue]="item.value">
+              </nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+
+    <div class="mt-2 mb-3">
+      <nz-table [nzData]="['']" [nzFrontPagination]="false" *ngIf="tableProductos.length > 0">
+        <thead>
+          <tr>
+            <th>Producto/Servicio</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Total</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let data of tableProductos">
+            <td>{{ data.descripcion }}</td>
+            <td>{{ data.precio }}</td>
+            <td>
+              <input
+                type="number" nz-input
+                value="{{ data.cantidad }}"
+                (change)="onCantidad(data.producto, $event)" 
+                disabled="{{ data.tipo === 2 ? true : false }}"
+              >
+            </td>
+            <td>{{ data.total }}</td>
+            <td>
+              <button nz-button 
+                (click)='deleteItem(data.producto)' 
+                nzType="default" 
+                nzShape="circle" 
+                nz-tooltip nzTooltipTitle="Eliminar"
+              >
+                <i nz-icon nzType="delete" theme="outline"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+
+    <nz-descriptions nzTitle="Totales" nzBordered class="mb-4" *ngIf="tableProductos.length > 0">
+      <nz-descriptions-item nzTitle="Subtotal" [nzSpan]="2">{{ subTotal }}</nz-descriptions-item>
+      <nz-descriptions-item nzTitle="Descuento" [nzSpan]="2">{{ descuento }}</nz-descriptions-item>
+      <nz-descriptions-item nzTitle="Iva" [nzSpan]="2">{{ iva }}</nz-descriptions-item>
+      <nz-descriptions-item nzTitle="Total" [nzSpan]="2">{{ granTotal }}</nz-descriptions-item>
+    </nz-descriptions>
+
+    <div class="d-flex align-items-center justify-content-between">
+      <nz-form-item>
+        <nz-form-control>
+          <button
+            nz-button
+            class="login-form-button"
+            [nzType]="'primary'"
+            [disabled]="newForm.invalid"
+            (click)="save(newForm) || tableProductos.length > 0"
+          >
+            <i nz-icon nzType="plus-circle" theme="outline"></i>
+            <span>{{ action }}</span> 
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+      
+      <nz-form-item>
+        <nz-form-control>
+          <button
+            nz-button
+            class="login-form-button"
+            [nzType]="'primary'"
+            nzDanger
+            (click)="enableCerrar()"
+          >
+            <i nz-icon nzType="close-circle" theme="outline"></i>
+            <span>Cancelar</span> 
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </form>
+</nz-card>

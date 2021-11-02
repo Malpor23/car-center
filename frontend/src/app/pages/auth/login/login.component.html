@@ -1,0 +1,66 @@
+<div class="container-fluid p-h-0 p-v-20 h-100 bg" style="background-image: url('assets/images/others/login-3.png')">
+  <div class="d-flex flex-column justify-content-between h-100">
+    <div class="d-none d-md-block"></div>
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-7 col-lg-5 m-h-auto">
+          <nz-card class="m-b-100 shadow-lg">
+            <div class="d-flex align-items-center justify-content-between m-b-30">
+              <h2 class="m-b-0">Acceder</h2>
+            </div>
+            <form nz-form [formGroup]="loginForm" novalidate nzLayout="vertical" class="login-form">
+              <nz-form-item>
+                <nz-form-label nzRequired nzFor="username">Usuario</nz-form-label
+                >
+                <nz-form-control nzErrorTip="Please input your username!">
+                  <nz-input-group [nzPrefix]="prefixUser">
+                    <input type="text" nz-input formControlName="username" />
+                  </nz-input-group>
+                  <div *ngIf="loginForm.controls.username.touched && loginForm.controls.username.errors?.required"
+                    class="text text-danger mt-1">
+                      El usuario es obligatorio
+                  </div>
+                </nz-form-control>
+              </nz-form-item>
+
+              <nz-form-item>
+                <nz-form-label nzRequired nzFor="password">Contraseña</nz-form-label>
+                <nz-form-control nzErrorTip="Please input your Password!">
+                  <nz-input-group [nzPrefix]="prefixLock">
+                    <input type="password" nz-input formControlName="password">
+                  </nz-input-group>
+                  <div *ngIf="loginForm.controls.password.touched && loginForm.controls.password.errors?.required"
+                    class="text text-danger mt-1">
+                      La contraseña es obligatoria
+                  </div>
+                </nz-form-control>
+            </nz-form-item>
+
+              <nz-form-item>
+                <nz-form-control>
+                  <div class="d-flex align-items-center justify-content-between">
+                    <span class="font-size-13 text-muted"
+                      >No tienes una cuenta?
+                      <a class="small" [routerLink]="['/registrar']">Regístrate</a>
+                    </span>
+                    <button
+                      nz-button
+                      class="login-form-button"
+                      [nzType]="'primary'"
+                      [disabled]="!loginForm.valid"
+                      (click)="login(loginForm.valid)"
+                    >
+                      Acceder
+                    </button>
+                  </div>
+                </nz-form-control>
+              </nz-form-item>
+            </form>
+            <ng-template #prefixUser><i nz-icon nzType="user"></i></ng-template>
+            <ng-template #prefixLock><i nz-icon nzType="lock"></i></ng-template>
+          </nz-card>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

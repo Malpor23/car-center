@@ -1,0 +1,189 @@
+<nz-card *ngIf="principal">
+  <section class="markdown">
+    <h1>SUsuarios<span class="subtitle"></span><span class="widget"></span></h1>
+  </section>
+  <div class="row m-b-30">
+    <div class="col-lg-8">
+      <div class="d-md-flex">
+        <div class="m-b-10 m-r-20"></div>
+      </div>
+    </div>
+    <div class="col-lg-4 text-right">
+      <a nz-button nzType="primary" (click)="enableNuevo()">
+        <i nz-icon nzType="plus-circle" theme="outline"></i>
+        <span>Nuevo</span>
+      </a>
+    </div>
+  </div>
+
+  <nz-table [nzData]="['']" [nzFrontPagination]="false">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Nombre</th>
+        <th>Usuario</th>
+        <th>Rol</th>
+      <!--  <th>Acciones</th> -->
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of listUsuarios;  let i=index">
+        <td>{{ i+1 }}</td>
+        <td>{{ row.tercero.primerNombre }} {{ row.tercero.primerApellido }} {{ row.tercero.segundoApellido }}</td>
+        <td>{{ row.username }}</td>
+        <td>{{ row.role.descripcion }}</td>
+        <!--
+        <td>
+          <nz-badge *ngIf="row.estado == 'En solicitud'" nzColor="#2db7f5"></nz-badge>
+          <nz-badge *ngIf="row.estado == 'En proceso'" nzStatus="processing"></nz-badge>
+          <nz-badge *ngIf="row.estado == 'Terminado'" nzStatus="success"></nz-badge>
+          <span class="text-capitalize">{{ row.estado }}</span>
+        </td>
+        <td class="text-md-right">
+          <a *ngIf="row.estado == 'En solicitud'"
+            class="m-r-5" 
+            (click)='enableEditar(row)' 
+            nz-button nzType="default" 
+            nzShape="circle" nz-tooltip nzTooltipTitle="Editar"
+          >
+            <i nz-icon nzType="edit" theme="outline"></i>
+          </a>
+          <button 
+            *ngIf="row.estado == 'En solicitud'"
+            nz-button 
+            (click)='delete(row)' 
+            nzType="default" 
+            nzShape="circle" nz-tooltip nzTooltipTitle="Eliminar"
+          >
+            <i nz-icon nzType="delete" theme="outline"></i>
+          </button>
+        </td>
+        -->
+      </tr>
+    </tbody>
+  </nz-table>
+  <nz-pagination 
+    [nzPageIndex]="1" 
+    [nzTotal]="total" 
+    (nzPageIndexChange)="getPage($event)"
+    [nzPageSize]="size"
+  ></nz-pagination>
+</nz-card>
+
+<!-- FORM -->
+<nz-card *ngIf="crud">
+  <section class="markdown">
+    <h1>{{ title }}<span class="subtitle"></span><span class="widget"></span></h1>
+  </section>
+
+  <form nz-form [formGroup]="newForm" novalidate class="login-form" [nzLayout]="'vertical'">
+    <div nz-row [nzGutter]="18">
+      <div nz-col nzXs="24" nzSm="24" nzMd="24" nzLg="24">
+        <nz-form-item>
+          <nz-form-label nzRequired>Tercero</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="tercero" nzShowSearch nzAllowClear>
+              <nz-option 
+                *ngFor="let item of listTerceros" 
+                [nzLabel]="item.label" 
+                [nzValue]="item.value"
+                [nzNotFoundContent]="'No se encontraron registros!'"          
+                [nzCustomContent]="'false'"
+              ></nz-option>
+            </nz-select>
+            <div *ngIf="newForm.controls.tercero.touched && newForm.controls.tercero.errors?.required" class="text text-danger mt-1">
+              Debe seleccionar un tercero
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+        <nz-form-item>
+          <nz-form-label nzRequired>Usuario</nz-form-label>
+          <nz-form-control>
+            <input type="text" nz-input formControlName="username"/>
+            <div *ngIf="newForm.controls.username.touched && newForm.controls.username.errors?.required"
+              class="text text-danger mt-1">
+                El usuario es obligatorio
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+        <nz-form-item>
+          <nz-form-label nzRequired>Contraseña</nz-form-label>
+          <nz-form-control>
+            <input type="password" nz-input formControlName="password">
+            <div *ngIf="newForm.controls.password.touched && newForm.controls.password.errors?.required"
+              class="text text-danger mt-1">
+                La contraseña es obligatoria
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+        <nz-form-item>
+          <nz-form-label nzRequired>Rol</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="role" nzShowSearch>
+              <nz-option 
+                *ngFor="let item of listRoles" 
+                [nzLabel]="item.descripcion" 
+                [nzValue]="item.id"
+              ></nz-option>
+            </nz-select>
+            <div *ngIf="newForm.controls.role.touched && newForm.controls.role.errors?.required" class="text text-danger mt-1">
+              Debe seleccionar un rol
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+
+      <div nz-col nzXs="24" nzSm="12" nzMd="12" nzLg="12">
+        <nz-form-item>
+          <nz-form-label>Estado</nz-form-label>
+          <nz-form-control>
+            <nz-switch formControlName="enabled" [nzCheckedChildren]="checkedTemplate" [nzUnCheckedChildren]="unCheckedTemplate"></nz-switch>
+            <ng-template #checkedTemplate><i nz-icon nzType="check"></i></ng-template>
+            <ng-template #unCheckedTemplate><i nz-icon nzType="close"></i></ng-template>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between">
+      <nz-form-item>
+        <nz-form-control>
+          <button
+            nz-button
+            class="login-form-button"
+            [nzType]="'primary'"
+            [disabled]="newForm.invalid"
+            (click)="save(newForm)"
+          >
+            <i nz-icon nzType="plus-circle" theme="outline"></i>
+            <span>{{ action }}</span> 
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-control>
+          <button
+            nz-button
+            class="login-form-button"
+            [nzType]="'primary'"
+            nzDanger
+            (click)="enableCerrar()"
+          >
+            <i nz-icon nzType="close-circle" theme="outline"></i>
+            <span>Cancelar</span> 
+          </button>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </form>
+</nz-card>
